@@ -17,3 +17,8 @@ dist/
 *.mobileprovision
 *.orig.*
 web-build/
+.vercel
+
+# IDEs
+.idea/
+.vscode/

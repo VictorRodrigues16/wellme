@@ -9,10 +9,10 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
-import { Button3D } from './Button3D';
-import { VitaMascot } from './VitaMascot';
-import { colors } from '../theme/colors';
-import { fontFamily } from '../theme/typography';
+import { Button3D } from '../ui/Button3D';
+import { VitaMascot } from '../mascot/VitaMascot';
+import { colors } from '../../theme/colors';
+import { fontFamily } from '../../theme/typography';
 import { Text } from 'react-native';
 
 interface CelebrationOverlayProps {

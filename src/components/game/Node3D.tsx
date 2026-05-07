@@ -11,8 +11,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../theme/colors';
-import { fontFamily } from '../theme/typography';
+import { colors } from '../../theme/colors';
+import { fontFamily } from '../../theme/typography';
 
 export type NodeStatus = 'locked' | 'available' | 'current' | 'completed';
 

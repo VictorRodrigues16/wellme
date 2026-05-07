@@ -1,12 +1,18 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
-import Animated, { FadeIn, FadeInDown, useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
+import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
-import { Button3D } from '../Button3D';
+import { Button3D } from '../ui/Button3D';
 import { colors } from '../../theme/colors';
 import { fontFamily } from '../../theme/typography';
 import type { DragDropPlateContent, PlateFood } from '../../data/types';
+
+type IoniconName = keyof typeof Ionicons.glyphMap;
+
+function asIcon(name: string): IoniconName {
+  return name as IoniconName;
+}
 
 interface Props { content: DragDropPlateContent; onComplete: () => void; }
 
@@ -69,7 +75,7 @@ export function DragDropPlateMission({ content, onComplete }: Props) {
               const isUltra = f.category === 'ultra';
               return (
                 <View key={f.id} style={[st.reviewChip, isUltra && st.reviewChipBad]}>
-                  <Ionicons name={f.emoji as any} size={16} color={isUltra ? colors.error : colors.primary} />
+                  <Ionicons name={asIcon(f.emoji)} size={16} color={isUltra ? colors.error : colors.primary} />
                   <Text style={[st.reviewChipText, isUltra && { color: colors.error }]}>{f.name}</Text>
                 </View>
               );
@@ -95,7 +101,7 @@ export function DragDropPlateMission({ content, onComplete }: Props) {
               {plate.map((f, i) => (
                 <Animated.View key={f.id} entering={FadeIn.duration(200)}>
                   <Pressable onPress={() => removeFromPlate(f.id)} style={st.plateItem}>
-                    <Ionicons name={f.emoji as any} size={20} color="#FFFFFF" />
+                    <Ionicons name={asIcon(f.emoji)} size={20} color="#FFFFFF" />
                     <Text style={st.plateItemText}>{f.name}</Text>
                     <Ionicons name="close-circle" size={16} color="rgba(255,255,255,0.5)" />
                   </Pressable>
@@ -139,7 +145,7 @@ function FoodCard({ food, onPress, disabled }: { food: PlateFood; onPress: () =>
   const isUltra = food.category === 'ultra';
   return (
     <Pressable onPress={onPress} disabled={disabled} style={[st.foodCard, isUltra && st.foodCardUltra, disabled && st.foodCardDisabled]}>
-      <Ionicons name={food.emoji as any} size={22} color={isUltra ? colors.error : '#FFFFFF'} />
+      <Ionicons name={asIcon(food.emoji)} size={22} color={isUltra ? colors.error : '#FFFFFF'} />
       <Text style={[st.foodName, isUltra && { color: colors.error }]} numberOfLines={1}>{food.name}</Text>
     </Pressable>
   );

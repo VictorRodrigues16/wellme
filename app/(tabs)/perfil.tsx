@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import {
   ActivityIndicator,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -9,6 +10,7 @@ import {
   Pressable,
   Modal,
 } from 'react-native';
+import { useRouter } from 'expo-router';
 import Animated, {
   FadeIn,
   FadeInDown,
@@ -27,17 +29,19 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useGame } from '../../src/context/GameContext';
 import { colors } from '../../src/theme/colors';
 import { fontFamily } from '../../src/theme/typography';
-import { StatCard } from '../../src/components/StatCard';
-import { ProgressBar } from '../../src/components/ProgressBar';
-import { Button3D } from '../../src/components/Button3D';
-import { VitaMascot } from '../../src/components/VitaMascot';
+import { StatCard } from '../../src/components/game/StatCard';
+import { ProgressBar } from '../../src/components/ui/ProgressBar';
+import { Button3D } from '../../src/components/ui/Button3D';
+import { VitaMascot } from '../../src/components/mascot/VitaMascot';
 
 export default function PerfilScreen() {
   const insets = useSafeAreaInsets();
-  const { state, derived, hydrated, updateName, resetProgress } = useGame();
+  const router = useRouter();
+  const { state, derived, hydrated, updateName, resetProgress, logout, session } = useGame();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState('');
   const [showResetModal, setShowResetModal] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   if (!hydrated || !state || !derived) {
     return (
@@ -66,6 +70,16 @@ export default function PerfilScreen() {
     resetProgress();
   };
 
+  const handleLogout = () => {
+    setShowLogoutModal(true);
+  };
+
+  const confirmLogout = async () => {
+    setShowLogoutModal(false);
+    await logout();
+    router.replace('/login');
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView
@@ -81,9 +95,16 @@ export default function PerfilScreen() {
             end={{ x: 1, y: 1 }}
             style={styles.headerCard}
           >
-            {/* Vita mascot as avatar */}
+            {/* Vita mascot as avatar with WellMe badge */}
             <View style={styles.avatarContainer}>
               <VitaMascot size={120} expression="happy" animated />
+              <View style={styles.brandBadge}>
+                <Image
+                  source={require('../../assets/icon.png')}
+                  style={styles.brandBadgeImg}
+                  accessibilityLabel="WellMe"
+                />
+              </View>
             </View>
 
             {/* Name */}
@@ -182,7 +203,17 @@ export default function PerfilScreen() {
           />
         </Animated.View>
 
-        {/* Reset Button */}
+        {/* Session info */}
+        {session ? (
+          <Animated.View entering={FadeInDown.delay(550).duration(400)} style={styles.sessionInfo}>
+            <Ionicons name="shield-checkmark" size={16} color={colors.primary} />
+            <Text style={styles.sessionText}>
+              Sessao iniciada em {new Date(session.loggedAt).toLocaleDateString('pt-BR')}
+            </Text>
+          </Animated.View>
+        ) : null}
+
+        {/* Action Buttons */}
         <Animated.View entering={FadeInDown.delay(600).duration(400)} style={styles.resetSection}>
           <Button3D
             label="RESETAR PROGRESSO"
@@ -192,7 +223,16 @@ export default function PerfilScreen() {
             shadowColor={colors.errorDark}
             size="medium"
           />
-          <Text style={styles.versionText}>SaúdeQuest v1.0</Text>
+          <View style={{ height: 12 }} />
+          <Button3D
+            label="SAIR DA CONTA"
+            onPress={handleLogout}
+            icon="log-out"
+            color={colors.surface}
+            shadowColor={colors.lockedDark}
+            size="medium"
+          />
+          <Text style={styles.versionText}>WellMe v1.0</Text>
         </Animated.View>
 
         {/* Footer spacer for tab bar */}
@@ -213,6 +253,27 @@ export default function PerfilScreen() {
                 </View>
                 <View style={{ flex: 1 }}>
                   <Button3D label="RESETAR" onPress={confirmReset} color={colors.error} shadowColor={colors.errorDark} icon="trash" size="medium" fullWidth />
+                </View>
+              </View>
+            </Pressable>
+          </Animated.View>
+        </Pressable>
+      </Modal>
+
+      {/* Logout confirmation modal */}
+      <Modal visible={showLogoutModal} transparent animationType="fade" onRequestClose={() => setShowLogoutModal(false)}>
+        <Pressable style={styles.modalOverlay} onPress={() => setShowLogoutModal(false)}>
+          <Animated.View entering={FadeInDown.duration(300)}>
+            <Pressable style={styles.modalCard} onPress={(e) => e.stopPropagation()}>
+              <Ionicons name="log-out" size={48} color={colors.blue} />
+              <Text style={styles.modalTitle}>Sair da conta?</Text>
+              <Text style={styles.modalDesc}>Voce voltara para a tela de login. Seu progresso fica salvo.</Text>
+              <View style={styles.modalButtons}>
+                <View style={{ flex: 1 }}>
+                  <Button3D label="CANCELAR" onPress={() => setShowLogoutModal(false)} color={colors.surface} shadowColor={colors.lockedDark} textColor="#FFFFFF" size="medium" fullWidth />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Button3D label="SAIR" onPress={confirmLogout} color={colors.blue} shadowColor={colors.blueDark} icon="log-out" size="medium" fullWidth />
                 </View>
               </View>
             </Pressable>
@@ -297,6 +358,44 @@ const styles = StyleSheet.create({
   },
   avatarContainer: {
     marginBottom: 16,
+    position: 'relative',
+  },
+  brandBadge: {
+    position: 'absolute',
+    right: -4,
+    bottom: 0,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 3,
+    borderColor: colors.primary,
+    overflow: 'hidden',
+  },
+  brandBadgeImg: {
+    width: 28,
+    height: 28,
+    borderRadius: 6,
+    resizeMode: 'cover',
+  },
+  sessionInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: 18,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    backgroundColor: 'rgba(88,204,2,0.1)',
+    borderRadius: 10,
+    alignSelf: 'center',
+  },
+  sessionText: {
+    fontFamily: fontFamily.semiBold,
+    fontSize: 12,
+    color: colors.primary,
   },
 
 

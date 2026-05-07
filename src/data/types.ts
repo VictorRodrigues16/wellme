@@ -1,4 +1,4 @@
-// Tipos compartilhados do SaúdeQuest.
+// Tipos compartilhados do WellMe.
 
 export type MissionStatus = 'locked' | 'available' | 'completed';
 export type MissionCategory = 'hidratacao' | 'movimento' | 'alimentacao' | 'mente' | 'sono' | 'prevencao' | 'habitos';
@@ -172,4 +172,11 @@ export interface GameState {
   user: User;
   missions: Mission[];
   achievements: Achievement[];
+}
+
+// Sessao mock — sem backend, apenas valida formato e persiste localmente.
+export interface Session {
+  name: string;
+  heroCode: string;
+  loggedAt: string; // ISO timestamp
 }

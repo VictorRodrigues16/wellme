@@ -3,11 +3,17 @@ import { View, Text, StyleSheet } from 'react-native';
 import Animated, { FadeIn, useSharedValue, useAnimatedStyle, withTiming, Easing } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
-import { Button3D } from '../Button3D';
-import { ProgressBar } from '../ProgressBar';
+import { Button3D } from '../ui/Button3D';
+import { ProgressBar } from '../ui/ProgressBar';
 import { colors } from '../../theme/colors';
 import { fontFamily } from '../../theme/typography';
 import type { TimerSequenceContent } from '../../data/types';
+
+type IoniconName = keyof typeof Ionicons.glyphMap;
+
+function asIcon(name: string): IoniconName {
+  return name as IoniconName;
+}
 
 interface Props { content: TimerSequenceContent; onComplete: () => void; catColor: string; catDark: string; }
 
@@ -76,7 +82,7 @@ export function TimerSequenceMission({ content, onComplete, catColor, catDark }:
           {content.steps.map((st, i) => (
             <View key={i} style={s.previewRow}>
               <View style={[s.previewBadge, { backgroundColor: catColor }]}>
-                <Ionicons name={st.icon as any} size={18} color="#FFFFFF" />
+                <Ionicons name={asIcon(st.icon)} size={18} color="#FFFFFF" />
               </View>
               <View style={s.previewInfo}>
                 <Text style={s.previewName}>{st.name}</Text>
@@ -98,7 +104,7 @@ export function TimerSequenceMission({ content, onComplete, catColor, catDark }:
 
       <Animated.View entering={FadeIn.duration(300)} key={currentStep} style={s.stepContainer}>
         <View style={[s.stepIcon, { backgroundColor: catColor }]}>
-          <Ionicons name={(step?.icon || 'body') as any} size={40} color="#FFFFFF" />
+          <Ionicons name={asIcon(step?.icon ?? 'body')} size={40} color="#FFFFFF" />
         </View>
         <Text style={s.stepName}>{step?.name}</Text>
         <Text style={s.stepInstruction}>{step?.instruction}</Text>

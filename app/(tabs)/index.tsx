@@ -22,12 +22,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useGame } from '../../src/context/GameContext';
 import { colors, categoryColors } from '../../src/theme/colors';
 import { fontFamily } from '../../src/theme/typography';
-import { Node3D } from '../../src/components/Node3D';
-import { ProgressBar } from '../../src/components/ProgressBar';
-import { Button3D } from '../../src/components/Button3D';
-import { VitaMascot } from '../../src/components/VitaMascot';
+import { Node3D } from '../../src/components/game/Node3D';
+import { ProgressBar } from '../../src/components/ui/ProgressBar';
+import { Button3D } from '../../src/components/ui/Button3D';
+import { VitaMascot } from '../../src/components/mascot/VitaMascot';
 import { VITA_TIPS } from '../../src/constants/vitaTips';
-import type { Mission } from '../../src/data/types';
+import type { Mission, MissionStatus } from '../../src/data/types';
+
+type NodeStatus = MissionStatus | 'current';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const STATS_HEIGHT = 90;
@@ -93,7 +95,7 @@ export default function TrilhaScreen() {
     const ox = nodeOffsetX(gi);
     const sel = selectedMission?.id === mission.id;
 
-    let ns: 'locked' | 'available' | 'current' | 'completed' = mission.status as any;
+    let ns: NodeStatus = mission.status;
     if (mission.status === 'available' && !missions.some((m) => m.status === 'available' && m.id < mission.id)) ns = 'current';
 
     const hasNext = index < section.data.length - 1;

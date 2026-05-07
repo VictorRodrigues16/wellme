@@ -10,17 +10,21 @@ import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors } from '../theme/colors';
-import { fontFamily } from '../theme/typography';
-import { useGame } from '../context/GameContext';
+import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { colors } from '../../theme/colors';
+import { fontFamily } from '../../theme/typography';
+import { useGame } from '../../context/GameContext';
 
-interface TabBarProps {
-  state: any;
-  descriptors: any;
-  navigation: any;
+type IoniconName = keyof typeof Ionicons.glyphMap;
+
+interface TabConfig {
+  icon: IoniconName;
+  activeIcon: IoniconName;
+  label: string;
+  color: string;
 }
 
-function useTabConfig() {
+function useTabConfig(): TabConfig[] {
   const { state: gameState } = useGame();
   const hasStreak = (gameState?.user.streak ?? 0) > 0;
 
@@ -36,7 +40,7 @@ function useTabConfig() {
   ];
 }
 
-export function TabBar({ state, descriptors, navigation }: TabBarProps) {
+export function TabBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const tabConfig = useTabConfig();
 
@@ -44,9 +48,9 @@ export function TabBar({ state, descriptors, navigation }: TabBarProps) {
     <View style={[styles.container, { paddingBottom: Math.max(insets.bottom, 8) }]}>
       <BlurView intensity={80} tint="dark" style={styles.blur}>
         <View style={styles.tabRow}>
-          {state.routes.map((route: any, index: number) => {
+          {state.routes.map((route, index) => {
             const isFocused = state.index === index;
-            const config = tabConfig[index] || tabConfig[0];
+            const config = tabConfig[index] ?? tabConfig[0];
 
             return (
               <TabItem
@@ -75,19 +79,15 @@ export function TabBar({ state, descriptors, navigation }: TabBarProps) {
   );
 }
 
-function TabItem({
-  label,
-  icon,
-  color,
-  isFocused,
-  onPress,
-}: {
+interface TabItemProps {
   label: string;
-  icon: string;
+  icon: IoniconName;
   color: string;
   isFocused: boolean;
   onPress: () => void;
-}) {
+}
+
+function TabItem({ label, icon, color, isFocused, onPress }: TabItemProps) {
   const scale = useSharedValue(1);
 
   const animStyle = useAnimatedStyle(() => ({
@@ -113,7 +113,7 @@ function TabItem({
           <View style={[styles.activeIndicator, { backgroundColor: color + '20' }]} />
         )}
         <Ionicons
-          name={icon as any}
+          name={icon}
           size={26}
           color={isFocused ? color : colors.textSecondary}
         />

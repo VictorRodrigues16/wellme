@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -8,11 +8,8 @@ import * as SplashScreen from 'expo-splash-screen';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withRepeat,
-  withSequence,
   withTiming,
   withDelay,
-  withSpring,
   Easing,
 } from 'react-native-reanimated';
 import {
@@ -23,13 +20,34 @@ import {
   Nunito_800ExtraBold,
   Nunito_900Black,
 } from '@expo-google-fonts/nunito';
-import { GameProvider } from '../src/context/GameContext';
+import { GameProvider, useGame } from '../src/context/GameContext';
 import { colors } from '../src/theme/colors';
-import { VitaMascot } from '../src/components/VitaMascot';
+import { VitaMascot } from '../src/components/mascot/VitaMascot';
 
 SplashScreen.preventAutoHideAsync();
 
 const SPLASH_DURATION = 3500;
+
+function AuthGate() {
+  const { hydrated, isAuthenticated } = useGame();
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!hydrated) return;
+
+    const firstSegment: string | undefined = segments[0];
+    const inAuthFlow = firstSegment === 'login';
+
+    if (!isAuthenticated && !inAuthFlow) {
+      router.replace('/login');
+    } else if (isAuthenticated && inAuthFlow) {
+      router.replace('/(tabs)');
+    }
+  }, [hydrated, isAuthenticated, segments, router]);
+
+  return null;
+}
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -56,6 +74,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <GameProvider>
+          <AuthGate />
           <StatusBar style="light" />
           <Stack
             screenOptions={{
@@ -66,6 +85,7 @@ export default function RootLayout() {
               animation: 'fade',
             }}
           >
+            <Stack.Screen name="login" options={{ headerShown: false }} />
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen
               name="mission/[id]"
@@ -90,11 +110,9 @@ function LoadingScreen() {
   const titleTranslateY = useSharedValue(12);
 
   useEffect(() => {
-    // Vita fades in softly from dim to full
     vitaOpacity.value = withTiming(1, { duration: 1800, easing: Easing.out(Easing.cubic) });
     vitaScale.value = withTiming(1, { duration: 2000, easing: Easing.out(Easing.cubic) });
 
-    // Title slides up and fades in after Vita settles
     titleOpacity.value = withDelay(800, withTiming(1, { duration: 1000, easing: Easing.out(Easing.cubic) }));
     titleTranslateY.value = withDelay(800, withTiming(0, { duration: 1000, easing: Easing.out(Easing.cubic) }));
   }, []);
@@ -116,8 +134,8 @@ function LoadingScreen() {
         <VitaMascot size={180} expression="happy" />
       </Animated.View>
       <Animated.View style={titleStyle}>
-        <Text style={loadingStyles.title}>SaúdeQuest</Text>
-        <Text style={loadingStyles.subtitle}>Sua jornada de saúde</Text>
+        <Text style={loadingStyles.title}>WellMe</Text>
+        <Text style={loadingStyles.subtitle}>Sua jornada de saude</Text>
       </Animated.View>
     </View>
   );

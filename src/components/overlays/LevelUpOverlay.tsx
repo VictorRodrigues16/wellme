@@ -9,9 +9,9 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
-import { VitaMascot } from './VitaMascot';
-import { colors } from '../theme/colors';
-import { fontFamily } from '../theme/typography';
+import { VitaMascot } from '../mascot/VitaMascot';
+import { colors } from '../../theme/colors';
+import { fontFamily } from '../../theme/typography';
 
 type OverlayType = 'level-up' | 'module-complete';
 

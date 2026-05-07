@@ -7,9 +7,9 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../theme/colors';
-import { fontFamily } from '../theme/typography';
-import { SHADOW_OFFSET } from '../theme/spacing';
+import { colors } from '../../theme/colors';
+import { fontFamily } from '../../theme/typography';
+import { SHADOW_OFFSET } from '../../theme/spacing';
 
 interface Button3DProps {
   label: string;

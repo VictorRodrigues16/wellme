@@ -1,12 +1,12 @@
 {
-  "name": "saudequest",
+  "name": "wellme",
   "version": "1.0.0",
   "main": "expo-router/entry",
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web"
+    "start": "expo start --port 2229",
+    "android": "expo start --android --port 2229",
+    "ios": "expo start --ios --port 2229",
+    "web": "expo start --web --port 2229"
   },
   "dependencies": {
     "@expo-google-fonts/nunito": "^0.4.2",

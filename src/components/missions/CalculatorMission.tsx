@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
-import { Button3D } from '../Button3D';
+import { Button3D } from '../ui/Button3D';
 import { colors } from '../../theme/colors';
 import { fontFamily } from '../../theme/typography';
 import type { CalculatorContent } from '../../data/types';

@@ -3,11 +3,13 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import Animated, { FadeIn, FadeInDown, useSharedValue, useAnimatedStyle, withTiming, withSpring } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
-import { Button3D } from '../Button3D';
-import { ProgressBar } from '../ProgressBar';
+import { Button3D } from '../ui/Button3D';
+import { ProgressBar } from '../ui/ProgressBar';
 import { colors } from '../../theme/colors';
 import { fontFamily } from '../../theme/typography';
 import type { QuizContent } from '../../data/types';
+
+type IoniconName = keyof typeof Ionicons.glyphMap;
 
 interface Props { content: QuizContent; onComplete: () => void; catColor: string; catDark: string; }
 
@@ -93,7 +95,7 @@ export function QuizMission({ content, onComplete, catColor, catDark }: Props) {
   );
 }
 
-function OptionCard({ text, letter, bg, shadow, onPress, disabled, showIcon }: { text: string; letter: string; bg: string; shadow: string; onPress: () => void; disabled: boolean; showIcon?: string }) {
+function OptionCard({ text, letter, bg, shadow, onPress, disabled, showIcon }: { text: string; letter: string; bg: string; shadow: string; onPress: () => void; disabled: boolean; showIcon?: IoniconName }) {
   const pressed = useSharedValue(0);
   const bodyStyle = useAnimatedStyle(() => ({ transform: [{ translateY: pressed.value * 4 }] }));
   const shadowStyle = useAnimatedStyle(() => ({ opacity: 1 - pressed.value }));
@@ -104,7 +106,7 @@ function OptionCard({ text, letter, bg, shadow, onPress, disabled, showIcon }: {
         <Animated.View style={[s.optBody, { backgroundColor: bg }, bodyStyle]}>
           <View style={s.optLetter}><Text style={s.optLetterTxt}>{letter}</Text></View>
           <Text style={s.optText}>{text}</Text>
-          {showIcon && <Ionicons name={showIcon as any} size={24} color="#FFFFFF" />}
+          {showIcon && <Ionicons name={showIcon} size={24} color="#FFFFFF" />}
         </Animated.View>
       </View>
     </Pressable>

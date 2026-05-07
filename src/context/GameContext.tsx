@@ -7,9 +7,17 @@ import React, {
   useState,
   type ReactNode,
 } from 'react';
-import { loadState, saveState, clearState, buildInitialState } from '../data/storage';
+import {
+  loadState,
+  saveState,
+  clearState,
+  buildInitialState,
+  loadSession,
+  saveSession,
+  clearSession,
+} from '../data/storage';
 import { XP_PER_LEVEL, CATEGORY_BY_ACHIEVEMENT } from '../data/initialData';
-import type { GameState, Mission, Achievement } from '../data/types';
+import type { GameState, Mission, Achievement, Session } from '../data/types';
 
 interface DerivedState {
   xpInLevel: number;
@@ -23,6 +31,10 @@ interface GameContextValue {
   state: GameState | null;
   derived: DerivedState | null;
   hydrated: boolean;
+  session: Session | null;
+  isAuthenticated: boolean;
+  login: (name: string, heroCode: string) => Promise<void>;
+  logout: () => Promise<void>;
   completeMission: (missionId: number) => void;
   updateName: (name: string) => void;
   resetProgress: () => Promise<void>;
@@ -40,8 +52,8 @@ function diffInDays(fromISO: string, toISO: string): number {
   return Math.round((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-// Garante que exista exatamente uma próxima missão "available" quando a
-// anterior foi concluída.
+// Garante que exista exatamente uma proxima missao "available" quando a
+// anterior foi concluida.
 function advanceAvailability(missions: Mission[]): Mission[] {
   let unlockedNext = false;
   return missions.map((m, i) => {
@@ -90,15 +102,24 @@ interface GameProviderProps {
 export function GameProvider({ children }: GameProviderProps) {
   const [state, setState] = useState<GameState | null>(null);
   const [hydrated, setHydrated] = useState(false);
+  const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
     (async () => {
-      const loaded = await loadState();
+      const [loaded, loadedSession] = await Promise.all([
+        loadState(),
+        loadSession(),
+      ]);
       const normalized: GameState = {
         ...loaded,
         missions: advanceAvailability(loaded.missions),
       };
+      // Sincroniza nome do usuario com o nome da sessao se ja existe sessao
+      if (loadedSession) {
+        normalized.user = { ...normalized.user, name: loadedSession.name };
+      }
       setState(normalized);
+      setSession(loadedSession);
       setHydrated(true);
     })();
   }, []);
@@ -107,6 +128,25 @@ export function GameProvider({ children }: GameProviderProps) {
     if (!hydrated || !state) return;
     saveState(state);
   }, [state, hydrated]);
+
+  const login = useCallback(async (name: string, heroCode: string) => {
+    const newSession: Session = {
+      name,
+      heroCode,
+      loggedAt: new Date().toISOString(),
+    };
+    await saveSession(newSession);
+    setSession(newSession);
+    setState((prev) => {
+      if (!prev) return prev;
+      return { ...prev, user: { ...prev.user, name } };
+    });
+  }, []);
+
+  const logout = useCallback(async () => {
+    await clearSession();
+    setSession(null);
+  }, []);
 
   const completeMission = useCallback((missionId: number) => {
     setState((prev) => {
@@ -158,11 +198,28 @@ export function GameProvider({ children }: GameProviderProps) {
 
   const updateName = useCallback((name: string) => {
     setState((prev) => (prev ? { ...prev, user: { ...prev.user, name } } : prev));
+    setSession((prev) => (prev ? { ...prev, name } : prev));
+    // Persiste nome atualizado na sessao
+    setSession((prev) => {
+      if (prev) {
+        const updated: Session = { ...prev, name };
+        saveSession(updated);
+        return updated;
+      }
+      return prev;
+    });
   }, []);
 
   const resetProgress = useCallback(async () => {
     await clearState();
-    setState(buildInitialState());
+    setState((prev) => {
+      const fresh = buildInitialState();
+      // mantem o nome se houver sessao
+      if (prev) {
+        fresh.user = { ...fresh.user, name: prev.user.name };
+      }
+      return fresh;
+    });
   }, []);
 
   const derived = useMemo<DerivedState | null>(() => {
@@ -183,6 +240,10 @@ export function GameProvider({ children }: GameProviderProps) {
     state,
     derived,
     hydrated,
+    session,
+    isAuthenticated: session !== null,
+    login,
+    logout,
     completeMission,
     updateName,
     resetProgress,

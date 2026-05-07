@@ -1,6 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import {
   ActivityIndicator,
+  FlatList,
   ScrollView,
   StyleSheet,
   Text,
@@ -9,6 +10,7 @@ import {
   Pressable,
   Dimensions,
 } from 'react-native';
+import type { ListRenderItem } from 'react-native';
 import Animated, {
   FadeIn,
   FadeInDown,
@@ -21,9 +23,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useGame } from '../../src/context/GameContext';
 import { colors } from '../../src/theme/colors';
 import { fontFamily } from '../../src/theme/typography';
-import { ProgressBar } from '../../src/components/ProgressBar';
-import { AchievementBadge3D } from '../../src/components/AchievementBadge3D';
-import { Button3D } from '../../src/components/Button3D';
+import { ProgressBar } from '../../src/components/ui/ProgressBar';
+import { AchievementBadge3D } from '../../src/components/game/AchievementBadge3D';
+import { Button3D } from '../../src/components/ui/Button3D';
 import type { Achievement } from '../../src/data/types';
 
 const WEEKDAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
@@ -74,6 +76,25 @@ export default function ConquistasScreen() {
   const practicedThisMonth = completedDates.filter((d) => {
     return d.startsWith(`${viewYear}-${String(viewMonth + 1).padStart(2, '0')}`);
   }).length;
+
+  const renderAchievement: ListRenderItem<Achievement> = ({ item, index }) => (
+    <Animated.View
+      key={item.id}
+      entering={FadeInDown.delay(500 + index * 60).duration(300)}
+      style={styles.gridItem}
+    >
+      <AchievementBadge3D
+        icon={item.icon}
+        title={item.title}
+        description={item.description}
+        unlocked={item.unlocked}
+        onPress={() => {
+          setSelectedAchievement(item);
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        }}
+      />
+    </Animated.View>
+  );
 
   return (
     <View style={styles.container}>
@@ -245,25 +266,15 @@ export default function ConquistasScreen() {
               {derived.unlockedAchievements} de {state.achievements.length} desbloqueadas
             </Text>
           </View>
-          <View style={styles.grid}>
-            {state.achievements.map((a, idx) => (
-              <Animated.View
-                key={a.id}
-                entering={FadeInDown.delay(500 + idx * 60).duration(300)}
-              >
-                <AchievementBadge3D
-                  icon={a.icon}
-                  title={a.title}
-                  description={a.description}
-                  unlocked={a.unlocked}
-                  onPress={() => {
-                    setSelectedAchievement(a);
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                  }}
-                />
-              </Animated.View>
-            ))}
-          </View>
+          <FlatList
+            data={state.achievements}
+            keyExtractor={(item) => item.id}
+            numColumns={3}
+            scrollEnabled={false}
+            columnWrapperStyle={styles.gridRow}
+            contentContainerStyle={styles.gridContainer}
+            renderItem={renderAchievement}
+          />
         </Animated.View>
 
         <View style={{ height: 100 }} />
@@ -630,6 +641,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
+  },
+  gridContainer: {
+    paddingBottom: 8,
+  },
+  gridRow: {
+    justifyContent: 'space-around',
+    marginBottom: 8,
+  },
+  gridItem: {
+    flex: 1 / 3,
+    alignItems: 'center',
   },
 
   // Modal

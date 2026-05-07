@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import type { StyleProp, ViewStyle, DimensionValue } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -9,8 +10,8 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
-import { colors } from '../theme/colors';
-import { fontFamily } from '../theme/typography';
+import { colors } from '../../theme/colors';
+import { fontFamily } from '../../theme/typography';
 
 interface ProgressBarProps {
   progress: number; // 0-1
@@ -18,7 +19,7 @@ interface ProgressBarProps {
   height?: number;
   gradientColors?: [string, string];
   showShine?: boolean;
-  style?: any;
+  style?: StyleProp<ViewStyle>;
 }
 
 export function ProgressBar({
@@ -53,7 +54,7 @@ export function ProgressBar({
   }, [showShine]);
 
   const fillStyle = useAnimatedStyle(() => ({
-    width: `${animatedProgress.value * 100}%` as any,
+    width: `${animatedProgress.value * 100}%` as DimensionValue,
   }));
 
   const shineStyle = useAnimatedStyle(() => ({
