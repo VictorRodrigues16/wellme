@@ -1,0 +1,17 @@
+{
+  "name": "wellme-arena-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Servidor Socket.IO da Arena ao Vivo do WellMe (deploy separado, ex.: Railway).",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "socket.io": "^4.8.1"
+  }
+}

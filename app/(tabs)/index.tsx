@@ -25,6 +25,7 @@ import { fontFamily } from '../../src/theme/typography';
 import { Node3D } from '../../src/components/game/Node3D';
 import { ProgressBar } from '../../src/components/ui/ProgressBar';
 import { Button3D } from '../../src/components/ui/Button3D';
+import { StateView } from '../../src/components/ui/StateView';
 import { VitaMascot } from '../../src/components/mascot/VitaMascot';
 import { VITA_TIPS } from '../../src/constants/vitaTips';
 import type { Mission, MissionStatus } from '../../src/data/types';
@@ -53,7 +54,11 @@ export default function TrilhaScreen() {
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
 
   if (!hydrated || !state || !derived) {
-    return <View style={s.loader}><ActivityIndicator color={colors.primary} size="large" /></View>;
+    return (
+      <View style={s.loader}>
+        <StateView status="loading" title="Carregando sua trilha…" />
+      </View>
+    );
   }
 
   const { missions } = state;

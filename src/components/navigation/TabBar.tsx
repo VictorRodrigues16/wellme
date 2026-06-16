@@ -24,21 +24,42 @@ interface TabConfig {
   color: string;
 }
 
-function useTabConfig(): TabConfig[] {
+// Config indexada por NOME da rota (não por índice) — assim adicionar/reordenar
+// abas em (tabs)/_layout.tsx nunca troca ícones/labels por engano.
+function useTabConfig(): Record<string, TabConfig> {
   const { state: gameState } = useGame();
   const hasStreak = (gameState?.user.streak ?? 0) > 0;
 
-  return [
-    { icon: 'map', activeIcon: 'map', label: 'Trilha', color: colors.primary },
-    {
+  return {
+    index: { icon: 'map', activeIcon: 'map', label: 'Trilha', color: colors.primary },
+    movimento: {
+      icon: 'walk-outline',
+      activeIcon: 'walk',
+      label: 'Movimento',
+      color: colors.orange,
+    },
+    arena: {
+      icon: 'flash-outline',
+      activeIcon: 'flash',
+      label: 'Arena',
+      color: colors.purple,
+    },
+    conquistas: {
       icon: hasStreak ? 'flame' : 'trophy-outline',
       activeIcon: hasStreak ? 'flame' : 'trophy',
       label: 'Ofensiva',
       color: hasStreak ? colors.orange : colors.gold,
     },
-    { icon: 'person-outline', activeIcon: 'person', label: 'Perfil', color: colors.blue },
-  ];
+    perfil: { icon: 'person-outline', activeIcon: 'person', label: 'Perfil', color: colors.blue },
+  };
 }
+
+const FALLBACK_TAB: TabConfig = {
+  icon: 'ellipse-outline',
+  activeIcon: 'ellipse',
+  label: '',
+  color: colors.textSecondary,
+};
 
 export function TabBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
@@ -50,7 +71,7 @@ export function TabBar({ state, navigation }: BottomTabBarProps) {
         <View style={styles.tabRow}>
           {state.routes.map((route, index) => {
             const isFocused = state.index === index;
-            const config = tabConfig[index] ?? tabConfig[0];
+            const config = tabConfig[route.name] ?? FALLBACK_TAB;
 
             return (
               <TabItem

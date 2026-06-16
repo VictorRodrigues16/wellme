@@ -26,6 +26,7 @@ import { fontFamily } from '../../src/theme/typography';
 import { ProgressBar } from '../../src/components/ui/ProgressBar';
 import { AchievementBadge3D } from '../../src/components/game/AchievementBadge3D';
 import { Button3D } from '../../src/components/ui/Button3D';
+import { StateView } from '../../src/components/ui/StateView';
 import type { Achievement } from '../../src/data/types';
 
 const WEEKDAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
@@ -46,7 +47,7 @@ export default function ConquistasScreen() {
   if (!hydrated || !state || !derived) {
     return (
       <View style={styles.loader}>
-        <ActivityIndicator color={colors.primary} size="large" />
+        <StateView status="loading" title="Carregando conquistas…" />
       </View>
     );
   }

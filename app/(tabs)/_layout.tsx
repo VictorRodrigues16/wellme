@@ -11,6 +11,8 @@ export default function TabsLayout() {
       }}
     >
       <Tabs.Screen name="index" options={{ title: 'Trilha' }} />
+      <Tabs.Screen name="movimento" options={{ title: 'Movimento' }} />
+      <Tabs.Screen name="arena" options={{ title: 'Arena' }} />
       <Tabs.Screen name="conquistas" options={{ title: 'Conquistas' }} />
       <Tabs.Screen name="perfil" options={{ title: 'Perfil' }} />
     </Tabs>

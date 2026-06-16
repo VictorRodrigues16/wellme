@@ -8,6 +8,7 @@ import { useGame } from '../../src/context/GameContext';
 import { colors, categoryColors } from '../../src/theme/colors';
 import { fontFamily } from '../../src/theme/typography';
 import { Button3D } from '../../src/components/ui/Button3D';
+import { StateView } from '../../src/components/ui/StateView';
 import { CelebrationOverlay } from '../../src/components/overlays/CelebrationOverlay';
 import { LevelUpOverlay } from '../../src/components/overlays/LevelUpOverlay';
 import { XP_PER_LEVEL } from '../../src/data/initialData';
@@ -53,11 +54,13 @@ export default function MissionScreen() {
   if (!mission || (!missionCompleted && mission.status !== 'available')) {
     return (
       <View style={styles.center}>
-        <View style={styles.errorCard}>
-          <Ionicons name="alert-circle" size={48} color={colors.error} />
-          <Text style={styles.errorText}>Missão não encontrada ou indisponível.</Text>
-          <Button3D label="VOLTAR" onPress={() => router.back()} icon="arrow-back" color={colors.primary} shadowColor={colors.primaryDark} />
-        </View>
+        <StateView
+          status="error"
+          title="Missão indisponível"
+          message="Esta missão não foi encontrada ou ainda está bloqueada."
+          onRetry={() => router.back()}
+          retryLabel="VOLTAR"
+        />
       </View>
     );
   }

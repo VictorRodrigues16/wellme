@@ -21,6 +21,8 @@ import {
   Nunito_900Black,
 } from '@expo-google-fonts/nunito';
 import { GameProvider, useGame } from '../src/context/GameContext';
+import { PedometerProvider } from '../src/context/PedometerContext';
+import { RealtimeProvider } from '../src/context/RealtimeContext';
 import { colors } from '../src/theme/colors';
 import { VitaMascot } from '../src/components/mascot/VitaMascot';
 
@@ -74,29 +76,33 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <GameProvider>
-          <AuthGate />
-          <StatusBar style="light" />
-          <Stack
-            screenOptions={{
-              headerStyle: { backgroundColor: colors.background },
-              headerTintColor: '#fff',
-              headerTitleStyle: { fontWeight: 'bold' },
-              contentStyle: { backgroundColor: colors.background },
-              animation: 'fade',
-            }}
-          >
-            <Stack.Screen name="login" options={{ headerShown: false }} />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="mission/[id]"
-              options={{
-                presentation: 'modal',
-                animation: 'slide_from_bottom',
-                title: 'Missao',
-                headerShown: false,
-              }}
-            />
-          </Stack>
+          <PedometerProvider>
+            <RealtimeProvider>
+              <AuthGate />
+              <StatusBar style="light" />
+              <Stack
+                screenOptions={{
+                  headerStyle: { backgroundColor: colors.background },
+                  headerTintColor: '#fff',
+                  headerTitleStyle: { fontWeight: 'bold' },
+                  contentStyle: { backgroundColor: colors.background },
+                  animation: 'fade',
+                }}
+              >
+                <Stack.Screen name="login" options={{ headerShown: false }} />
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="mission/[id]"
+                  options={{
+                    presentation: 'modal',
+                    animation: 'slide_from_bottom',
+                    title: 'Missao',
+                    headerShown: false,
+                  }}
+                />
+              </Stack>
+            </RealtimeProvider>
+          </PedometerProvider>
         </GameProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

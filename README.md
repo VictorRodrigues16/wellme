@@ -22,6 +22,16 @@ Aplicativo mobile gamificado de hábitos saudáveis, inspirado no Duolingo. O us
 - **Feedback háptico** em todas as interações
 - **Suporte web** (PWA estática via react-native-web)
 
+### ✨ Novidades da Sprint 4 (Mobile + IoT)
+
+- **Arena ao Vivo** — ranking de heróis em **tempo real** via Socket.IO (presence "X online" + feed de eventos; a UI reordena sozinha). Cai em modo simulado se não houver servidor.
+- **Movimento** — **pedômetro** (`expo-sensors`) conta passos reais que viram XP + **notificações locais** (`expo-notifications`) de hidratação/movimento, com permissões on-demand.
+- **Segurança** — `heroCode` guardado no **SecureStore** (Keychain/Keystore); URLs em variáveis `EXPO_PUBLIC_*`; checklist `npm run check:secrets`.
+- **UI/UX** — componentes `StateView` e `ConnectionBadge` padronizam os estados (vazio/loading/erro/sucesso) em todas as telas.
+- **IoT** — não implementado (produto software-only); ver [docs/JUSTIFICATIVA_IOT.md](docs/JUSTIFICATIVA_IOT.md).
+
+> Detalhes completos da Sprint 4 em **[docs/SPRINT4.md](docs/SPRINT4.md)**.
+
 ## Tecnologias
 
 | Categoria | Stack |
@@ -118,10 +128,60 @@ npx expo export -p web
 
 Toda a progressão fica em `AsyncStorage` (no web, localStorage). As chaves usadas:
 
-- `@wellme:session:v1` — sessão do usuário (nome, autenticado)
+- `@wellme:session:v1` — sessão do usuário (apenas `nome` + data de login)
 - `@wellme:state:v1` — estado do jogo (XP, missões, conquistas, datas)
 
+O **`heroCode` (credencial) NÃO fica em texto-puro**: a partir da Sprint 4 ele é
+guardado no `expo-secure-store` (Keychain no iOS / Keystore no Android). No build web
+não há keychain, então cai para AsyncStorage — nesse caso o `heroCode` é uma credencial
+mock, não senha real (ver [docs/SPRINT4.md](docs/SPRINT4.md)).
+
 Limpar dados do navegador / app zera o progresso.
+
+## Variáveis de ambiente
+
+Copie `.env.example` para `.env.local` (não versionado) e preencha. As variáveis
+`EXPO_PUBLIC_*` são **públicas** (embutidas no bundle) — use só para URLs públicas:
+
+- `EXPO_PUBLIC_REALTIME_URL` — URL do servidor Socket.IO (vazio = modo simulado)
+- `EXPO_PUBLIC_REALTIME_MODE` — `auto` | `live` | `simulated`
+
+Verifique que não há segredos no código com `npm run check:secrets`.
+
+## Servidor de tempo real (Arena)
+
+O ranking ao vivo usa um servidor Socket.IO em [`server/`](server/). Ele roda **separado**
+do app (não entra no bundle), pois o Vercel serve apenas o front estático e não mantém
+WebSocket persistente. Sem servidor configurado, a Arena entra em **modo simulado** (badge
+"Simulado") — útil como fallback, mas que **não** demonstra eventos cliente↔servidor reais.
+
+### Rodar localmente para a demonstração
+
+Para mostrar o tempo real **de verdade** (exigido pela rubrica), basta rodar o servidor na
+própria máquina — **não precisa de Railway nem deploy**:
+
+```bash
+# Terminal 1 — sobe o servidor Socket.IO
+cd server
+npm install
+npm start                       # fica em http://localhost:3001  (GET /health p/ testar)
+
+# Terminal 2 — sobe o app apontando para o servidor local
+# crie um arquivo .env.local na raiz com a linha:
+#   EXPO_PUBLIC_REALTIME_URL=http://localhost:3001
+npx expo start -c               # -c limpa o cache do Metro
+```
+
+**Demonstração mais simples (2 abas no navegador, sem celular nem túnel):**
+
+1. Abra o app web em **duas abas** — ambas conectam ao `localhost:3001`.
+2. Aba 1: entre como "Ana" e abra a aba **Arena** → o badge deve ficar **"Ao vivo"** (verde), não "Simulado".
+3. Aba 2: entre como "Téo" e **conclua uma missão**.
+4. Na aba 1, o ranking **reordena sozinho** e o feed mostra "Téo ganhou +60 XP" — sem recarregar.
+
+> No celular (Expo Go), use o IP da máquina na LAN (`http://192.168.x.x:3001`) em vez de
+> `localhost`. Deploy opcional (Railway etc.) e contrato de eventos em
+> [server/README.md](server/README.md).
 
 ## Screenshots
 

@@ -14,14 +14,18 @@
       "backgroundColor": "#4CAF50"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSMotionUsageDescription": "O WellMe usa o sensor de movimento para contar seus passos e transformá-los em XP."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#4CAF50"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "permissions": ["ACTIVITY_RECOGNITION"]
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -29,7 +33,9 @@
     },
     "plugins": [
       "expo-router",
-      "expo-font"
+      "expo-font",
+      "expo-secure-store",
+      "expo-notifications"
     ]
   }
 }

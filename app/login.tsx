@@ -256,10 +256,14 @@ export default function LoginScreen() {
 
             <Pressable
               onPress={() => {
-                setName('Estudante FIAP');
-                setHeroCode('FIAP2025');
+                // Gera credenciais efêmeras em runtime — nada hardcoded no bundle.
+                const suffix = Math.floor(1000 + Math.random() * 9000);
+                const demoName = `Herói ${suffix}`;
+                const demoCode = `h${suffix}${Math.random().toString(36).slice(2, 6)}`;
+                setName(demoName);
+                setHeroCode(demoCode);
                 setTouched({ name: true, heroCode: true });
-                setErrors({});
+                setErrors(validate(demoName, demoCode));
               }}
               style={styles.demoBtn}
               disabled={submitting}

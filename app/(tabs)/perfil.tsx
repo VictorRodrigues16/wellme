@@ -32,6 +32,7 @@ import { fontFamily } from '../../src/theme/typography';
 import { StatCard } from '../../src/components/game/StatCard';
 import { ProgressBar } from '../../src/components/ui/ProgressBar';
 import { Button3D } from '../../src/components/ui/Button3D';
+import { StateView } from '../../src/components/ui/StateView';
 import { VitaMascot } from '../../src/components/mascot/VitaMascot';
 
 export default function PerfilScreen() {
@@ -46,7 +47,7 @@ export default function PerfilScreen() {
   if (!hydrated || !state || !derived) {
     return (
       <View style={styles.loader}>
-        <ActivityIndicator color={colors.primary} size="large" />
+        <StateView status="loading" title="Carregando seu perfil…" />
       </View>
     );
   }

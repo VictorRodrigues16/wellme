@@ -36,6 +36,11 @@ interface GameContextValue {
   login: (name: string, heroCode: string) => Promise<void>;
   logout: () => Promise<void>;
   completeMission: (missionId: number) => void;
+  /**
+   * Caminho único para creditar XP fora do fluxo de missões (ex.: passos do
+   * pedômetro). Recalcula nível e conquistas, mas NÃO altera streak/missões.
+   */
+  grantXp: (amount: number, reason?: string) => void;
   updateName: (name: string) => void;
   resetProgress: () => Promise<void>;
 }
@@ -196,10 +201,26 @@ export function GameProvider({ children }: GameProviderProps) {
     });
   }, []);
 
+  const grantXp = useCallback((amount: number, reason?: string) => {
+    if (!Number.isFinite(amount) || amount <= 0) return;
+    const gain = Math.round(amount);
+    setState((prev) => {
+      if (!prev) return prev;
+      const newXp = prev.user.xp + gain;
+      const newLevel = Math.floor(newXp / XP_PER_LEVEL) + 1;
+      const nextState: GameState = {
+        ...prev,
+        user: { ...prev.user, xp: newXp, level: newLevel },
+      };
+      nextState.achievements = recomputeAchievements(nextState);
+      return nextState;
+    });
+    if (__DEV__ && reason) console.log(`[XP] +${gain} (${reason})`);
+  }, []);
+
   const updateName = useCallback((name: string) => {
     setState((prev) => (prev ? { ...prev, user: { ...prev.user, name } } : prev));
-    setSession((prev) => (prev ? { ...prev, name } : prev));
-    // Persiste nome atualizado na sessao
+    // Atualiza e persiste o nome na sessao (um unico updater).
     setSession((prev) => {
       if (prev) {
         const updated: Session = { ...prev, name };
@@ -245,6 +266,7 @@ export function GameProvider({ children }: GameProviderProps) {
     login,
     logout,
     completeMission,
+    grantXp,
     updateName,
     resetProgress,
   };
