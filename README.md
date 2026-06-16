@@ -185,10 +185,15 @@ npx expo start -c               # -c limpa o cache do Metro
 
 ## Screenshots
 
-| Login | Trilha | Conquistas | Perfil |
-|:---:|:---:|:---:|:---:|
-| ![Login](assets/screenshots/login.png) | ![Trilha](assets/screenshots/trilha.png) | ![Conquistas](assets/screenshots/conquistas.png) | ![Perfil](assets/screenshots/perfil.png) |
-| Tela de login com validação dos campos `nome` (min 2 chars) e `código` (min 4 chars) | Trilha gamificada com módulos, nodes interativos, XP e ofensiva no topo | Calendário de dias praticados + meta de ofensiva + galeria de conquistas | Avatar Vita, nível, XP detalhado, estatísticas e botão de sair |
+| Login | Trilha | Movimento |
+|:---:|:---:|:---:|
+| ![Login](assets/screenshots/login.png) | ![Trilha](assets/screenshots/trilha.png) | ![Movimento](assets/screenshots/movimento.png) |
+| Login com validação de `nome` e `código de herói` | Trilha gamificada com módulos, nodes 3D, XP e ofensiva | **Movimento (novo)** — passos do sensor viram XP + lembretes locais |
+
+| Arena | Conquistas | Perfil |
+|:---:|:---:|:---:|
+| ![Arena](assets/screenshots/arena.png) | ![Conquistas](assets/screenshots/conquistas.png) | ![Perfil](assets/screenshots/perfil.png) |
+| **Arena ao Vivo (novo)** — ranking de heróis em tempo real (Socket.IO) | Calendário de prática + meta de ofensiva + galeria de conquistas | Avatar Vita, nível, XP detalhado, estatísticas e logout |
 
 ## Deploy
 
